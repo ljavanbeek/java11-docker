@@ -1,29 +1,16 @@
+FROM        openjdk:11.0.3-jre-slim
 
-FROM ubuntu:18.04
+LABEL       author="Lucas van Beek" maintainer="info@lucasvanbeek.nl"
 
-MAINTAINER Lucas van Beek, <info@lucasvanbeek.nl>
+RUN apt-get update -y \
+ && apt-get install -y curl ca-certificates openssl git tar sqlite fontconfig tzdata iproute2 \
+ && useradd -d /home/container -m container
 
-RUN apt update \
-    && apt upgrade -y \
-    && apt autoremove -y \
-    && apt autoclean \
-    && apt -y install curl software-properties-common locales git cmake \
-    && useradd -d /home/container -m container
+USER        container
+ENV         USER=container HOME=/home/container
 
+WORKDIR     /home/container
 
-RUN locale-gen en_US.UTF-8
-ENV LANG en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
-
-
-RUN apt -y install openjdk-11-jdk maven
-
-USER container
-ENV  USER container
-ENV  HOME /home/container
-
-WORKDIR /home/container
-
-COPY ./entrypoint.sh /entrypoint.sh
+COPY        ./entrypoint.sh /entrypoint.sh
 
 CMD ["/bin/bash", "/entrypoint.sh"]
